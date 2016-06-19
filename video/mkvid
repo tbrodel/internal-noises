@@ -1,0 +1,54 @@
+#!/bin/sh
+
+SCRIPT=$(readlink -f "$0")
+SCRIPT_PATH=$(dirname $SCRIPT)
+STAGEDIR=$SCRIPT_PATH/stage
+PAGE=0
+LAST=473
+POST=438
+TEX=internal-noises
+
+mkdir -p $STAGEDIR/
+cd $SCRIPT_PATH/tex
+pdflatex $TEX
+
+cd $STAGEDIR
+mkdir -p ./pre ./post ./mp4 
+
+while [ $PAGE -lt $POST ]
+do
+	PREFIX=`printf %03d $PAGE`|| break
+	echo "$TEX.pdf[$PAGE] -> $PREFIX.png" || break
+	convert -density 100x100 -antialias $SCRIPT_PATH/tex/$TEX.pdf[$PAGE] \
+		-resize 1920x -quality 100 -background white -alpha remove \
+		./pre/$PREFIX.png || break
+	PAGE=`expr $PAGE + 1` || break
+done
+
+while [ $PAGE -le $LAST ]
+do
+	PREFIX=`printf %03d $PAGE`|| break
+	echo "$TEX.pdf[$PAGE] -> $PREFIX.png" || break
+	convert -density 100x100 -antialias $SCRIPT_PATH/tex/$TEX.pdf[$PAGE] \
+		-resize 1920x -quality 100 -background white -alpha remove \
+		./post/$PREFIX.png || break
+	PAGE=`expr $PAGE + 1` || break
+done
+
+ffmpeg -framerate 1/5 -pattern_type glob -i 'pre/*.png' -c:v libx264 -r 30 \
+	-pix_fmt yuv420p -filter:v "crop=1920:1080:0:57" ./mp4/0.mp4
+ffmpeg -framerate 1/1 -pattern_type glob -i 'post/*.png' -c:v libx264 -r 30 \
+	-pix_fmt yuv420p -filter:v "crop=1920:1080:0:57" ./mp4/1.mp4
+ffmpeg -loop 1 -i post/`printf %03d $LAST`.png -c:v libx264 -r 30 -t 15 \
+	-pix_fmt yuv420p -filter:v "crop=1920:1080:0:57" ./mp4/fade.mp4
+ffmpeg -i mp4/fade.mp4 -filter:v "fade=out:150:300" ./mp4/2.mp4
+
+cd $STAGEDIR/mp4
+rm -f files fade.mp4
+for f in *
+do 
+	echo "file '$f'" >> files
+done
+ffmpeg -f concat -i ./files -c copy ./out.mp4
+mv -v ./out.mp4 $SCRIPT_PATH
+
