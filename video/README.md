@@ -1,6 +1,6 @@
 #mkvid
 
-this script depends on ffmpeg, image-magick, and texlive.
+this script depends on [ffmpeg](http://ffmpeg.org/), [image magick](http://imagemagick.org/script/index.php), and [texlive](https://www.tug.org/texlive/).
 
 run
 
