@@ -49,6 +49,6 @@ for f in *
 do 
 	echo "file '$f'" >> files
 done
-ffmpeg -f concat -i ./files -c copy ./$TEC.mp4
+ffmpeg -f concat -i ./files -c copy ./$TEX.mp4
 mv -v ./$TEX.mp4 $SCRIPT_PATH
 
