@@ -3,6 +3,7 @@
 this script depends on ffmpeg, image-magick, and texlive.
 
 run
+
   ./chmod +x mkvid
   ./mkvid
   
