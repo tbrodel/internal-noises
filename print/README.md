@@ -1,3 +1,3 @@
 this is the print version of *internal noises*
 
-compilation requires a tex distribution, i'd recommend [texlive](https://www.tug.org/texlive/)
+compilation requires a TeX distribution, i'd recommend [TeX Live](https://www.tug.org/texlive/)
